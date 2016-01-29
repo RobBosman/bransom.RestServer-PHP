@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<set>
+	<c_st_nofk id="T_c_st_nofk_1" published="true"/>
+	<c_st_nofk id="T_c_st_nofk_2" published="true"/>
+	<d_st_nofk id="T_d_st_nofk_1" published="true"/>
+	<d_st_nofk id="T_d_st_nofk_2" published="true"/>
+	<c_st_nofk id="T_c_st_nofk_3" published="true"/>
+	<c_st_nofk id="T_c_st_nofk_4" published="true"/>
+	<d_st_nofk id="T_d_st_nofk_3" published="true"/>
+	<d_st_nofk id="T_d_st_nofk_4" published="true"/>
+</set>

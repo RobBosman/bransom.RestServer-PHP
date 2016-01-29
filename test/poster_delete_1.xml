@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<set>
+	<a_nost_fk id="T_a_nost_fk_1" deleted="true"/>
+	<a_st_fk id="T_a_st_fk_1" deleted="true"/>
+	<a_nost_nofk id="T_a_nost_nofk_1" deleted="true"/>
+	<a_st_nofk id="T_a_st_nofk_1" deleted="true"/>
+</set>

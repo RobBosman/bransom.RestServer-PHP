@@ -1,0 +1,40 @@
+<html>
+	<header>
+		<title>OpenID associate</title>
+	<header>
+	<body>
+		<h3>OpenID associate</h3>
+<!--
+		<form action="https://www.google.com/accounts/o8/ud" method="GET">
+-->
+		<form action="https://www.google.com/a/cerios.nl/o8/ud" method="GET">
+			<input type="hidden" name="be" value="o8" />
+			<table>
+				<tr>
+					<td>OP url</td>
+					<td><a href="https://www.google.com/a/cerios.nl/o8/ud">https://www.google.com/a/cerios.nl/o8/ud</a></td>
+				</tr>
+				<tr>
+					<td>openid.ns</td>
+					<td><input type="text" size="100" name="openid.ns" value="http://specs.openid.net/auth/2.0" /></td>
+				</tr>
+				<tr>
+					<td>openid.mode</td>
+					<td><input type="text" size="100" name="openid.mode" value="associate" /></td>
+				</tr>
+				<tr>
+					<td>openid.assoc_type</td>
+					<td><input type="text" size="100" name="openid.assoc_type" value="HMAC-SHA256" /></td>
+				</tr>
+				<tr>
+					<td>openid.session_type</td>
+					<td><input type="text" size="100" name="openid.session_type" value="no-encryption" /></td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td><input type="submit" value="GO!" /></td>
+				</tr>
+			</table>
+		</form>
+	</body>
+</html>

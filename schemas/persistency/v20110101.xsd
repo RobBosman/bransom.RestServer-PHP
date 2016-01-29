@@ -1,0 +1,158 @@
+<?xml version="1.0"?>
+<xsd:schema
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:tns="http://www.bransom.nl/schemas/vanace/webitems/v20110101"
+	targetNamespace="http://www.bransom.nl/schemas/vanace/webitems/v20110101"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+
+	<xsd:element name="_entity" type="tns:_Entity" />
+	<xsd:complexType name="_Entity">
+		<xsd:sequence>
+			<xsd:element name="id_object" type="tns:EntityKey" minOccurs="0" />
+			<xsd:element name="id_state" type="tns:EntityKey" minOccurs="0" />
+		</xsd:sequence>
+		<xsd:attribute name="key" use="optional">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:token">
+					<xsd:enumeration value="primary" />
+					<xsd:enumeration value="foreign" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:complexType name="EntityKey">
+		<xsd:attribute name="key" use="optional">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:token">
+					<xsd:enumeration value="primary" />
+					<xsd:enumeration value="foreign" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+
+	<xsd:simpleType name="TypeAttr">
+		<xsd:restriction base="xsd:token">
+			<xsd:enumeration value="entity" />
+		</xsd:restriction>
+	</xsd:simpleType>
+
+
+	<xsd:element name="set" type="tns:Set" />
+	<xsd:element name="site" type="tns:Site" substitutionGroup="tns:_entity" />
+	<xsd:element name="itemset" type="tns:Itemset" />
+	<xsd:element name="settings_a" type="tns:Settings_a" />
+	<xsd:element name="settings_b" type="tns:Settings_b" />
+	<xsd:element name="item" type="tns:Item" />
+	<xsd:element name="image" type="tns:Image" />
+
+	<xsd:complexType name="Set">
+		<xsd:sequence>
+			<xsd:element ref="tns:site" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="tns:itemset" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="tns:settings_a" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="tns:settings_b" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="tns:item" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="tns:image" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+		<xsd:attribute name="published" use="optional" type="xsd:boolean" />
+		<xsd:attribute name="at" use="optional" type="xsd:dateTime" />
+	</xsd:complexType>
+
+	<xsd:complexType name="Site">
+		<xsd:complexContent>
+			<xsd:extension base="tns:_Entity">
+				<xsd:sequence>
+					<xsd:element name="name" type="xsd:token" />
+					<xsd:element ref="tns:itemset" minOccurs="0" maxOccurs="unbounded" />
+				</xsd:sequence>
+				<xsd:attribute name="type" use="optional" type="tns:TypeAttr" />
+				<xsd:attribute name="published" use="optional" type="xsd:boolean" />
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="Itemset">
+		<xsd:sequence>
+			<xsd:element name="id_object" type="tns:EntityKey" minOccurs="0" />
+			<xsd:element name="id_state" type="tns:EntityKey" minOccurs="0" />
+			<xsd:element name="name" type="xsd:token" />
+			<xsd:element ref="tns:settings_a" minOccurs="0" />
+			<xsd:element ref="tns:settings_b" minOccurs="0" />
+			<xsd:element ref="tns:item" minOccurs="0" maxOccurs="unbounded" />
+		</xsd:sequence>
+		<xsd:attribute name="type" use="optional" type="tns:TypeAttr" />
+		<xsd:attribute name="published" use="optional" type="xsd:boolean" />
+	</xsd:complexType>
+
+	<xsd:complexType name="Settings_a">
+		<xsd:all>
+			<xsd:element name="id_object" type="tns:EntityKey" minOccurs="0" />
+			<xsd:element name="id_state" type="tns:EntityKey" minOccurs="0" />
+		</xsd:all>
+		<xsd:attribute name="type" use="optional" type="tns:TypeAttr" />
+		<xsd:attribute name="published" use="optional" type="xsd:boolean" />
+	</xsd:complexType>
+
+	<xsd:complexType name="Settings_b">
+		<xsd:all>
+			<xsd:element name="id_object" type="tns:EntityKey" minOccurs="0" />
+			<xsd:element name="id_state" type="tns:EntityKey" minOccurs="0" />
+			<xsd:element name="width" type="xsd:integer" />
+			<xsd:element name="height" type="xsd:integer" />
+			<xsd:element name="visibleItems" type="xsd:integer" />
+			<xsd:element name="itemWidth" type="xsd:integer" />
+			<xsd:element name="itemHeight" type="xsd:integer" />
+			<xsd:element name="itemsHSpacing" type="xsd:integer" />
+			<xsd:element name="itemsVSpacing" type="xsd:integer" />
+			<xsd:element name="arrowVSpacing" type="xsd:integer" />
+			<xsd:element name="showArrows" type="xsd:integer" />
+			<xsd:element name="showScrollbar" type="xsd:integer" />
+			<xsd:element name="scrollbarHeight" type="xsd:integer" />
+			<xsd:element name="maxBlur" type="xsd:integer" />
+			<xsd:element name="slideTime" type="xsd:float" />
+			<xsd:element name="autoPlay" type="xsd:integer" />
+			<xsd:element name="autoPlayDelay" type="xsd:integer" />
+			<xsd:element name="pauseOnItemMouseOver" type="xsd:integer" />
+			<xsd:element name="itemReflection" type="xsd:integer" />
+			<xsd:element name="reflectionAlpha" type="xsd:integer" />
+			<xsd:element name="reflectionHeight" type="xsd:integer" />
+			<xsd:element name="reflectionDistance" type="xsd:integer" />
+		</xsd:all>
+		<xsd:attribute name="type" use="optional" type="tns:TypeAttr" />
+		<xsd:attribute name="published" use="optional" type="xsd:boolean" />
+	</xsd:complexType>
+
+	<xsd:complexType name="Item">
+		<xsd:all>
+			<xsd:element name="id_object" type="tns:EntityKey" minOccurs="0" />
+			<xsd:element name="id_state" type="tns:EntityKey" minOccurs="0" />
+			<xsd:element name="title" type="xsd:string" />
+			<xsd:element name="subTitle" type="xsd:string" />
+			<xsd:element name="content" type="xsd:string" />
+			<xsd:element name="linkUrl" type="xsd:token" minOccurs="0" />
+			<xsd:element name="linkTarget" type="xsd:integer" minOccurs="0" />
+			<xsd:element ref="tns:image" minOccurs="0" />
+		</xsd:all>
+		<xsd:attribute name="type" use="optional" type="tns:TypeAttr" />
+		<xsd:attribute name="published" use="optional" type="xsd:boolean" />
+	</xsd:complexType>
+
+	<xsd:complexType name="Image">
+		<xsd:all>
+			<xsd:element name="id_object" type="tns:EntityKey" minOccurs="0" />
+			<xsd:element name="id_state" type="tns:EntityKey" minOccurs="0" />
+			<xsd:element name="width" type="xsd:integer" />
+			<xsd:element name="height" type="xsd:integer" />
+			<xsd:element name="mediatype" type="xsd:string" />
+			<xsd:element name="caption" type="xsd:string" />
+			<xsd:element name="url" type="xsd:anyURI" minOccurs="0" />
+			<xsd:element name="data" type="xsd:base64Binary" minOccurs="0" />
+		</xsd:all>
+		<xsd:attribute name="type" use="optional" type="tns:TypeAttr" />
+		<xsd:attribute name="published" use="optional" type="xsd:boolean" />
+	</xsd:complexType>
+
+</xsd:schema>

@@ -1,0 +1,80 @@
+<html>
+	<header>
+		<title>OpenID check authentication</title>
+	<header>
+	<body>
+		<h3>OpenID check authentication</h3>
+<!--
+		<form action="https://www.google.com/accounts/o8/ud" method="GET">
+-->
+		<form action="https://www.google.com/a/cerios.nl/o8/ud" method="GET">
+			<input type="hidden" name="be" value="o8" />
+			<table>
+				<tr>
+					<td>OP url</td>
+					<td><a href="https://www.google.com/a/cerios.nl/o8/ud">https://www.google.com/a/cerios.nl/o8/ud</a></td>
+				</tr>
+				<tr>
+					<td>openid.ns</td>
+					<td><input type="text" size="100" name="openid.ns" value="http://specs.openid.net/auth/2.0" /></td>
+				</tr>
+				<tr>
+					<td>openid.mode</td>
+					<td><input type="text" size="100" name="openid.mode" value="check_authentication" /></td>
+				</tr>
+				<tr>
+					<td>openid.op_endpoint</td>
+					<td><input type="text" size="100" name="openid.op_endpoint" value="https://www.google.com/a/cerios.nl/o8/ud?be=o8" /></td>
+				</tr>
+				<tr>
+					<td>openid.response_nonce</td>
+					<td><input type="text" size="100" name="openid.response_nonce" value="2012-03-16T13:53:54ZRmlniasqTCo28w" /></td>
+				</tr>
+				<tr>
+					<td>openid.return_to</td>
+					<td><input type="text" size="100" name="openid.return_to" value="http://ita.cerios.nl/test/Echo.html" /></td>
+				</tr>
+				<tr>
+					<td>openid.assoc_handle</td>
+					<td><input type="text" size="100" name="openid.assoc_handle" value="AMlYA9UpzmYT4BJaYdcR4CRrzTYOM9bCTpXym8phfVre_shzSRBQ6XvA" /></td>
+				</tr>
+				<tr>
+					<td>openid.signed</td>
+					<td><input type="text" size="100" name="openid.signed" value="op_endpoint,claimed_id,identity,return_to,response_nonce,assoc_handle,ns.ext1,ext1.mode,ext1.type.email,ext1.value.email" /></td>
+				</tr>
+				<tr>
+					<td>openid.sig</td>
+					<td><input type="text" size="100" name="openid.sig" value="uJ2+AJh11A6HBiwJBaIWGVCFYiQ=" /></td>
+				</tr>
+				<tr>
+					<td>openid.identity</td>
+					<td><input type="text" size="100" name="openid.identity" value="http://cerios.nl/openid?id=115043436682452836147" /></td>
+				</tr>
+				<tr>
+					<td>openid.claimed_id</td>
+					<td><input type="text" size="100" name="openid.claimed_id" value="http://cerios.nl/openid?id=115043436682452836147" /></td>
+				</tr>
+				<tr>
+					<td>openid.ns.ext1</td>
+					<td><input type="text" size="100" name="openid.ns.ext1" value="http://openid.net/srv/ax/1.0" /></td>
+				</tr>
+				<tr>
+					<td>openid.ext1.mode</td>
+					<td><input type="text" size="100" name="openid.ext1.mode" value="fetch_response" /></td>
+				</tr>
+				<tr>
+					<td>openid.ext1.type.email</td>
+					<td><input type="text" size="100" name="openid.ext1.type.email" value="http://schema.openid.net/contact/email" /></td>
+				</tr>
+				<tr>
+					<td>openid.ext1.value.email</td>
+					<td><input type="text" size="100" name="openid.ext1.value.email" value="rob.bosman@cerios.nl" /></td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td><input type="submit" value="GO!" /></td>
+				</tr>
+			</table>
+		</form>
+	</body>
+</html>

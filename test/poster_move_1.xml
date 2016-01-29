@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<set>
+	<!-- move all relationships from a_nost_fk to a_st_fk -->
+	<a_nost_fk id="T_a_nost_fk_1">
+		<_account id="1"/>
+		<value>Aa Ba (CHANGED 1)</value>
+		<!-- don't keep moved relationships here; these are MOVED
+		<b_nost_nofk id="T_b_nost_nofk_1"/>
+		<b_st_nofk id="T_b_st_nofk_1"/>
+		-->
+	</a_nost_fk>
+	<a_st_fk id="T_a_st_fk_1">
+		<_account id="1"/>
+		<value>Ca Da (CHANGED 1)</value>
+		<!-- don't keep the old relationships; these are DELETED
+		<b_nost_nofk id="T_b_nost_nofk_2"/>
+		<b_st_nofk id="T_b_st_nofk_2"/>
+		-->
+		<!-- these objects are MOVED from a_nost_fk to a_st_fk -->
+		<b_nost_nofk id="T_b_nost_nofk_1">
+			<value>Ab 1 (MOVED 1)</value>
+		</b_nost_nofk>
+		<b_st_nofk id="T_b_st_nofk_1">
+			<value>Bb 1 (MOVED 1)</value>
+		</b_st_nofk>
+	</a_st_fk>
+</set>

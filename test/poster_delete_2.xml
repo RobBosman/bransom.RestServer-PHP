@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<set>
+	<c_nost_nofk id="T_c_nost_nofk_1" deleted="true"/>
+	<c_nost_nofk id="T_c_nost_nofk_2" deleted="true"/>
+	<c_st_nofk id="T_c_st_nofk_1" deleted="true"/>
+	<c_st_nofk id="T_c_st_nofk_2" deleted="true"/>
+	<d_nost_nofk id="T_d_nost_nofk_1" deleted="true"/>
+	<d_nost_nofk id="T_d_nost_nofk_2" deleted="true"/>
+	<d_st_nofk id="T_d_st_nofk_1" deleted="true"/>
+	<d_st_nofk id="T_d_st_nofk_2" deleted="true"/>
+	<c_nost_nofk id="T_c_nost_nofk_3" deleted="true"/>
+	<c_nost_nofk id="T_c_nost_nofk_4" deleted="true"/>
+	<c_st_nofk id="T_c_st_nofk_3" deleted="true"/>
+	<c_st_nofk id="T_c_st_nofk_4" deleted="true"/>
+	<d_nost_nofk id="T_d_nost_nofk_3" deleted="true"/>
+	<d_nost_nofk id="T_d_nost_nofk_4" deleted="true"/>
+	<d_st_nofk id="T_d_st_nofk_3" deleted="true"/>
+	<d_st_nofk id="T_d_st_nofk_4" deleted="true"/>
+</set>

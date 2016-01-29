@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<set>
+	<!-- move all relationships from a_nost_nofk to a_st_nofk -->
+	<a_nost_nofk id="T_a_nost_nofk_1">
+		<_account id="1"/>
+		<value>Ea Fa Ia Ja Ma Na (CHANGED 2)</value>
+		<!-- don't keep the moved relationships here
+		<c_nost_nofk id="T_c_nost_nofk_1"/>
+		<c_nost_nofk id="T_c_nost_nofk_2"/>
+		<c_st_nofk id="T_c_st_nofk_1"/>
+		<c_st_nofk id="T_c_st_nofk_2"/>
+		<d_nost_nofk id="T_d_nost_nofk_1"/>
+		<d_nost_nofk id="T_d_nost_nofk_2"/>
+		<d_st_nofk id="T_d_st_nofk_1"/>
+		<d_st_nofk id="T_d_st_nofk_2"/>
+		-->
+	</a_nost_nofk>
+	<a_st_nofk id="T_a_st_nofk_1">
+		<_account id="1"/>
+		<value>Ga Ha Ka La Oa Pa (CHANGED 2)</value>
+		<!-- these objects are moved from a_nost_fk to a_st_fk -->
+		<c_nost_nofk id="T_c_nost_nofk_1">
+			<value>Ic (MOVED 2)</value>
+		</c_nost_nofk>
+		<c_nost_nofk id="T_c_nost_nofk_2">
+			<value>Ic (MOVED 2)</value>
+		</c_nost_nofk>
+		<c_st_nofk id="T_c_st_nofk_1">
+			<value>Jc (MOVED 2)</value>
+		</c_st_nofk>
+		<c_st_nofk id="T_c_st_nofk_2">
+			<value>Jc (MOVED 2)</value>
+		</c_st_nofk>
+		<d_nost_nofk id="T_d_nost_nofk_1">
+			<value>Md (MOVED 2)</value>
+		</d_nost_nofk>
+		<d_nost_nofk id="T_d_nost_nofk_2">
+			<value>Md (MOVED 2)</value>
+		</d_nost_nofk>
+		<d_st_nofk id="T_d_st_nofk_1">
+			<value>Nd (MOVED 2)</value>
+		</d_st_nofk>
+		<d_st_nofk id="T_d_st_nofk_2">
+			<value>Nd (MOVED 2)</value>
+		</d_st_nofk>
+		<!-- keep existing relationships -->
+		<b_nost_fk id="T_b_nost_fk_3"/>
+		<b_nost_fk id="T_b_nost_fk_4"/>
+		<b_st_fk id="T_b_st_fk_3"/>
+		<b_st_fk id="T_b_st_fk_4"/>
+		<c_nost_nofk id="T_c_nost_nofk_3"/>
+		<c_nost_nofk id="T_c_nost_nofk_4"/>
+		<c_st_nofk id="T_c_st_nofk_3"/>
+		<c_st_nofk id="T_c_st_nofk_4"/>
+		<d_nost_nofk id="T_d_nost_nofk_3"/>
+		<d_nost_nofk id="T_d_nost_nofk_4"/>
+		<d_st_nofk id="T_d_st_nofk_3"/>
+		<d_st_nofk id="T_d_st_nofk_4"/>
+	</a_st_nofk>
+</set>

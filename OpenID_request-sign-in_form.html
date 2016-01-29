@@ -1,0 +1,80 @@
+<html>
+	<header>
+		<title>OpenID request sign-in</title>
+	<header>
+	<body>
+		<h3>OpenID request sign-in</h3>
+<!--
+		<form action="https://www.google.com/accounts/o8/ud" method="GET">
+-->
+		<form action="https://www.google.com/a/cerios.nl/o8/ud" method="GET">
+			<input type="hidden" name="be" value="o8" />
+			<table>
+				<tr>
+					<td>OP url</td>
+					<td><a href="https://www.google.com/a/cerios.nl/o8/ud">https://www.google.com/a/cerios.nl/o8/ud</a></td>
+				</tr>
+				<tr>
+					<td>openid.ns</td>
+					<td><input type="text" size="100" name="openid.ns" value="http://specs.openid.net/auth/2.0" /></td>
+				</tr>
+				<tr>
+					<td>openid.mode</td>
+					<td><input type="text" size="100" name="openid.mode" value="checkid_setup" /></td>
+				</tr>
+				<tr>
+					<td>openid.claimed_id</td>
+					<td><input type="text" size="100" name="openid.claimed_id" value="http://specs.openid.net/auth/2.0/identifier_select" /></td>
+				</tr>
+				<tr>
+					<td>openid.identity</td>
+					<td><input type="text" size="100" name="openid.identity" value="http://specs.openid.net/auth/2.0/identifier_select" /></td>
+				</tr>
+				<tr>
+					<td>openid.realm</td>
+					<td><input type="text" size="100" name="openid.realm" value="http://ita.cerios.nl/" /></td>
+				</tr>
+				<tr>
+					<td>openid.return_to</td>
+					<td><input type="text" size="100" name="openid.return_to" value="http://ita.cerios.nl/test/Echo.html" /></td>
+				</tr>
+				<tr>
+					<td>openid.ns.pape</td>
+					<td><input type="text" size="100" name="openid.ns.pape" value="http://specs.openid.net/extensions/pape/1.0" /></td>
+				</tr>
+				<tr>
+					<td>openid.ns.ui</td>
+					<td><input type="text" size="100" name="openid.ns.ui" value="http://specs.openid.net/extensions/ui/1.0" /></td>
+				</tr>
+				<tr>
+					<td>openid.ui.mode</td>
+					<td><input type="text" size="100" name="openid.ui.mode" value="x-has-session" /></td>
+				</tr>
+				<tr>
+					<td>openid.ui.icon</td>
+					<td><input type="text" size="100" name="openid.ui.icon" value="true" /></td>
+				</tr>
+				<tr>
+					<td>openid.ns.ax</td>
+					<td><input type="text" size="100" name="openid.ns.ax" value="http://openid.net/srv/ax/1.0" /></td>
+				</tr>
+				<tr>
+					<td>openid.ax.mode</td>
+					<td><input type="text" size="100" name="openid.ax.mode" value="fetch_request" /></td>
+				</tr>
+				<tr>
+					<td>openid.ax.required</td>
+					<td><input type="text" size="100" name="openid.ax.required" value="email" /></td>
+				</tr>
+				<tr>
+					<td>openid.ax.type.email</td>
+					<td><input type="text" size="100" name="openid.ax.type.email" value="http://schema.openid.net/contact/email" /></td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td><input type="submit" value="GO!" /></td>
+				</tr>
+			</table>
+		</form>
+	</body>
+</html>
