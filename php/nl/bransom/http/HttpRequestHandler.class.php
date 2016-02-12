@@ -20,7 +20,8 @@ class HttpRequestHandler {
         '__utma', '__utmb', '__utmc', '__utmd', '__utmt', '__utmv', '__utmx', '__utmxx', '__utmz', // Google Analytics
         'km_ai', 'km_lv', 'km_ni', 'km_uq', 'km_vs', 'kvcd',  // KISSmetrics
         '_ga', // Google Universal Analytics (analytics.js)
-        'blnx'
+        'blnx',
+        'ajs_anonymous_id', 'ajs_group_id', 'ajs_user_id'
     );
     private static $TO_BE_IGNORED_PARAM_PATTERNS = array(
         '/BCSI-CS-[0-9a-f]*/i'  // Webtrends Analytics
