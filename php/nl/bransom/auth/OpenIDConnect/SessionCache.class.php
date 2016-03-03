@@ -15,8 +15,8 @@ class SessionCache {
   private static $NUM_TIME_DIGITS = 12;
 
   public static function get($cacheKey) {
-    $key = $cacheKey[self::ID];
-    if (!isset($_SESSION[$key])) {
+    $key = self::getSessionKey($cacheKey);
+    if (!isset($_SESSION) || !array_key_exists($key, $_SESSION)) {
       return FALSE;
     }
     if (isset($cacheKey[self::EXP])) {
@@ -35,8 +35,13 @@ class SessionCache {
   }
 
   public static function clear($cacheKey) {
-    if (isset($_SESSION[$cacheKey])) {
-      unset($_SESSION[$cacheKey]);
+    $key = self::getSessionKey($cacheKey);
+    if (isset($_SESSION) && array_key_exists($key, $_SESSION)) {
+      unset($_SESSION[$key]);
     }
+  }
+  
+  private static function getSessionKey($cacheKey) {
+    return $cacheKey[self::ID];
   }
 }

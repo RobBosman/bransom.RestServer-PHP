@@ -1,7 +1,7 @@
 <?php
 
 Bootstrap::import('nl.bransom.Config');
-Bootstrap::import('nl.bransom.auth.OpenIDConnectHandler');
+Bootstrap::import('nl.bransom.auth.OpenIDConnect.OpenIDConnectHandler');
 Bootstrap::import('nl.bransom.auth.HTPasswordHandler');
 
 Bootstrap::startSession();

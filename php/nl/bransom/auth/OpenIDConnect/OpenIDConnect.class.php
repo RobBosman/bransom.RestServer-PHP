@@ -47,6 +47,7 @@ class OpenIDConnect {
         if ($jwtPayload == NULL) {
             $requestError = filter_input(INPUT_GET, 'error');
             if (isset($requestError)) {
+                self::logErrorAndClearCache($requestError);
                 HttpUtil::replyError(500, $requestError);
             }
 
@@ -55,6 +56,7 @@ class OpenIDConnect {
             if (!isset($requestState)) {
                 $this->requestAuthCode($redirectUrl, $hostedDomain, $legacyRealm);
             } else if ($requestState != $this->getAntiForgeryStateToken(FALSE)) {
+                self::logErrorAndClearCache('Invalid state parameter');
                 HttpUtil::replyError(401, 'Invalid state parameter');
             } else if (isset($requestCode)) {
                 $jwt = $this->exchangeCodeForJWT($requestCode, $redirectUrl);
@@ -69,11 +71,7 @@ class OpenIDConnect {
             try {
                 return OpenIDTokenVerifier::getValidatedJWTPayload($jwt, self::getOpenIDJWKS());
             } catch (Exception $e) {
-                // Just to be sure: refresh the cached config and JWKS.
-                SessionCache::clear(self::$OPENID_CONFIG_CACHE_KEY);
-                SessionCache::clear(self::$JWKS_CACHE_KEY);
-
-                error_log($e->getMessage() . "\r\n" . $e->getTraceAsString());
+                self::logErrorAndClearCache($e->getMessage() . "\r\n" . $e->getTraceAsString());
             }
         }
         return NULL;
@@ -155,5 +153,14 @@ class OpenIDConnect {
         }
         $openIDConfig = json_decode($openIDConfigJSON, TRUE);
         return $openIDConfig[$key];
+    }
+    
+    private static function logErrorAndClearCache($errorMessage) {
+        error_log($errorMessage);
+        // Just to be sure: clear the cached config and JWKS.
+        SessionCache::clear(self::$ANTI_FORGERY_STATE_TOKEN_CACHE_KEY);
+        SessionCache::clear(self::$OPENID_CONFIG_CACHE_KEY);
+        SessionCache::clear(self::$JWKS_CACHE_KEY);
+        SessionCache::clear(self::$PARKED_JWT_CACHE_KEY);
     }
 }
