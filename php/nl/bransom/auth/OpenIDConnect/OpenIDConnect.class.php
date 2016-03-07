@@ -58,7 +58,7 @@ class OpenIDConnect {
             } else if ($requestState != $this->getAntiForgeryStateToken(FALSE)) {
                 self::logErrorAndClearCache("Invalid state parameter: expected\n\t"
                         . $this->getAntiForgeryStateToken(FALSE)
-                        . " but got\n\t$requestState.");
+                        . " but got\n\t$requestState.\n$_SERVER[REQUEST_URI]");
                 HttpUtil::replyError(401, 'Invalid state parameter');
             } else if (isset($requestCode)) {
                 $jwt = $this->exchangeCodeForJWT($requestCode, $redirectUrl);
