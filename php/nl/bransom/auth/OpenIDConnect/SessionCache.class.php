@@ -30,10 +30,6 @@ class SessionCache {
   }
 
   public static function set($cacheKey, $value) {
-    if (!isset($_SESSION)) {
-      error_log('$_SESSION not defined; cannot cache ' . $cacheKey[sel::ID]);
-      return;
-    }
     $key = $cacheKey[self::ID];
     $_SESSION[$key] = sprintf("%'.0" . self::$NUM_TIME_DIGITS . "d", time()) . $value;
   }
