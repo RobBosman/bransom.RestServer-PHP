@@ -52,8 +52,12 @@ class QueryEntity extends Query {
 
         // Add the query parameters to the where-clause.
         foreach ($this->queryParams as $paramName => $paramValue) {
-            $this->searchEntity->getProperty($paramName);
-            $this->addWhereClause($paramName, $paramValue);
+            $property = $this->searchEntity->getProperty($paramName, FALSE);
+            if ($property == NULL) {
+                error_log("Ignoring unknown query parameter: '$paramName=$paramValue'.");
+            } else {
+                $this->addWhereClause($paramName, $paramValue);
+            }
         }
     }
 
@@ -132,5 +136,3 @@ class QueryEntity extends Query {
         return "$joins WHERE TRUE$whereClauses";
     }
 }
-
-?>

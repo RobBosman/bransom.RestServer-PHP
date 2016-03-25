@@ -227,7 +227,7 @@ class RestController {
     private function readObjectSet($appName, $entityName) {
         $schema = $this->metaData->getSchema($appName);
         $entity = $schema->getObjectEntity($entityName);
-        $this->processQueryParams($schema, $entity, TRUE);
+        $this->processQueryParams($schema, $entity);
         $objectFetcher = $this->getObjectFetcher($appName);
         // Read all objects of the given entity.
         $domDoc = $this->domImplementation->createDocument();
@@ -239,7 +239,7 @@ class RestController {
     private function readObjectTree($appName, $entityName, $id) {
         $schema = $this->metaData->getSchema($appName);
         $entity = $schema->getObjectEntity($entityName);
-        $this->processQueryParams($schema, $entity, TRUE);
+        $this->processQueryParams($schema, $entity);
         $persistedId = $this->temporaryIdMap->getPersistedId($entity, $id);
         $objectFetcher = $this->getObjectFetcher($appName);
         // Read one object from the given entities.
@@ -256,7 +256,7 @@ class RestController {
     private function readObjectProperty($appName, $entityName, $id, $propertyName) {
         $schema = $this->metaData->getSchema($appName);
         $entity = $schema->getObjectEntity($entityName);
-        $this->processQueryParams($schema, $entity, TRUE);
+        $this->processQueryParams($schema, $entity);
         $persistedId = $this->temporaryIdMap->getPersistedId($entity, $id);
         $objectFetcher = $this->getObjectFetcher($appName);
         // Read one property of an object from the given entity.
@@ -357,7 +357,7 @@ class RestController {
      */
     private function processXmlObjects($appName, array $xmlElements, $restResponseCode) {
         $schema = $this->metaData->getSchema($appName);
-        $this->processQueryParams($schema, NULL, FALSE);
+        $this->processQueryParams($schema, NULL);
         $mySQLi = $schema->getMySQLi();
         try {
             $account = PersistentAccount::getAccount($schema, AuthHandler::getSignedInAccountId($appName));
@@ -440,8 +440,8 @@ class RestController {
         }
     }
 
-    private function processQueryParams(Schema $schema, $mainEntity, $allowFetchParams) {
-        // Get rid of any 'PHPSESSION' param.
+    private function processQueryParams(Schema $schema, $mainEntity) {
+        // Get rid of any 'PHPSESSION' and cookie params.
         RestUrlParams::extractValue($this->params, session_name());
 
         // Create/restore the temporaryIdMap.
@@ -450,12 +450,9 @@ class RestController {
             $storedTemporaryIds = TemporaryIdMap::deserializeTemporaryIds($schema, $_SESSION[$this->sessionId]);
         }
         $this->temporaryIdMap = new TemporaryIdMap($storedTemporaryIds);
-
+        
         // Validate that prefixed parameters refer to existing entities.
         foreach ($this->params as $paramName => &$paramValue) {
-            if (!$allowFetchParams) {
-                throw new Exception("Query parameter '$paramName' is not allowed.", RestResponse::CLIENT_ERROR);
-            }
             if (RestUrlParams::isFetchParam($paramName)) {
                 continue;
             }
@@ -465,7 +462,9 @@ class RestController {
             $queryParam = NULL;
             if (count($paramNameParts) == 1) {
                 if ($mainEntity == NULL) {
-                    throw new Exception("Unknown query parameter '$paramName'.", RestResponse::CLIENT_ERROR);
+                    error_log("Ignoring unknown query parameter: '$paramName=$paramValue'.");
+                    unset($this->params[$paramName]);
+                    continue;
                 }
                 $entity = $mainEntity;
                 $queryParam = $paramNameParts[0];
@@ -492,5 +491,3 @@ class RestController {
     }
 
 }
-
-?>

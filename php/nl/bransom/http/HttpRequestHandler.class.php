@@ -14,32 +14,6 @@ Bootstrap::import('nl.bransom.rest.RestResponse');
 class HttpRequestHandler {
 
     private static $METHOD_PARAM = '$method';
-    
-    // Cookies for web analytics can be passed as parameter and must be ignored
-    private static $TO_BE_IGNORED_PARAM_NAMES = array(
-        '__utma', '__utmb', '__utmc', '__utmd', '__utmt', '__utmv', '__utmx', '__utmxx', '__utmz', // Google Analytics
-        'km_ai', 'km_lv', 'km_ni', 'km_uq', 'km_vs', 'kvcd',  // KISSmetrics
-        '_ga', // Google Universal Analytics (analytics.js)
-        'blnx',
-        'ajs_anonymous_id', 'ajs_group_id', 'ajs_user_id'
-    );
-    private static $TO_BE_IGNORED_PARAM_PATTERNS = array(
-        '/BCSI-CS-[0-9a-f]*/i'  // Webtrends Analytics
-    );
-
-    private static function isToBeIgnoredParam($paramName) {
-        foreach (self::$TO_BE_IGNORED_PARAM_NAMES as $ignoreParamName) {
-            if (strcasecmp($paramName, $ignoreParamName) == 0) {
-                return TRUE;
-            }
-        }
-        foreach (self::$TO_BE_IGNORED_PARAM_PATTERNS as $ignoreParamPattern) {
-            if (preg_match($ignoreParamPattern, $paramName) === 1) {
-                return TRUE;
-            }
-        }
-        return FALSE;
-    }
 
     /**
      * @param $method
@@ -91,11 +65,11 @@ class HttpRequestHandler {
                 }
             }
             
+            $params['spam'] = 'boe!';
+            
             // Filter QueryString parameters that are to be ignored. Also correct the method (POST/GET) here.
             foreach ($params as $name => $value) {
-                if (self::isToBeIgnoredParam($name)) {
-                    unset($params[$name]);
-                } else if (strcasecmp($name, self::$METHOD_PARAM) == 0) {
+                if (strcasecmp($name, self::$METHOD_PARAM) == 0) {
                     $method = $value;
                     unset($params[$name]);
                 }
@@ -181,5 +155,3 @@ class HttpRequestHandler {
     }
 
 }
-
-?>

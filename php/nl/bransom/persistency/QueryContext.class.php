@@ -92,6 +92,7 @@ class QueryContext {
         if ($id != NULL) {
             $queryParams[$entity->getObjectIdColumnName()] = $id;
         }
+        $entity->removeUnknownParameters($queryParams);
         return $queryParams;
     }
 
@@ -103,5 +104,3 @@ class QueryContext {
         }
     }
 }
-
-?>

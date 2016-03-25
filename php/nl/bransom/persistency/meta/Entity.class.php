@@ -66,6 +66,15 @@ abstract class Entity {
         }
         return NULL;
     }
+    
+    public function removeUnknownParameters(array& $params) {
+        // Ignore tracking cookies and other unknown parameters.
+        foreach($params as $paramName) {
+            if (!in_array($paramName, $this->properties)) {
+                unset($params[$paramName]);
+            }
+        }
+    }
 
     public function getRelationships() {
         return $this->relationships;
@@ -82,5 +91,3 @@ abstract class Entity {
     public abstract function isObjectEntity();
 
 }
-
-?>
