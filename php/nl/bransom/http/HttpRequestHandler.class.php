@@ -65,8 +65,6 @@ class HttpRequestHandler {
                 }
             }
             
-            $params['spam'] = 'boe!';
-            
             // Filter QueryString parameters that are to be ignored. Also correct the method (POST/GET) here.
             foreach ($params as $name => $value) {
                 if (strcasecmp($name, self::$METHOD_PARAM) == 0) {
