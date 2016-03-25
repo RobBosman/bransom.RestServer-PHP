@@ -236,10 +236,11 @@ class RestParser {
             $modifyingAction = ParsedObject::DELETED;
             // Ensure that objects that are to be deleted have a persisted id.
             if ($id == NULL) {
-                throw new Exception("Cannot delete '$entityName' if no @id attribute is specified.",
+                throw new Exception("Cannot delete '" . $entity->getName() . "' if no @id attribute is specified.",
                         RestResponse::CLIENT_ERROR);
             } else if ($persistedId == NULL) {
-                throw new Exception("Cannot delete '$entityName' with non-persisted id '$id'.",
+                // A temporary, non-persisted object must be deleted.
+                throw new Exception("Cannot delete '" . $entity->getName() . "' with non-persisted id '$id'.",
                         RestResponse::CLIENT_ERROR);
             }
         } else if ($xmlElement->childNodes->length > 0) {
