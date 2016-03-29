@@ -462,7 +462,7 @@ class RestController {
             $queryParam = NULL;
             if (count($paramNameParts) == 1) {
                 if ($mainEntity == NULL) {
-                    error_log("Ignoring unknown query parameter: '$paramName=$paramValue'.");
+//                    error_log("Ignoring unknown query parameter: '$paramName=$paramValue'.");
                     unset($this->params[$paramName]);
                     continue;
                 }

@@ -54,7 +54,7 @@ class QueryEntity extends Query {
         foreach ($this->queryParams as $paramName => $paramValue) {
             $property = $this->searchEntity->getProperty($paramName, FALSE);
             if ($property == NULL) {
-                error_log("Ignoring unknown query parameter: '$paramName=$paramValue'.");
+//                error_log("Ignoring unknown query parameter: '$paramName=$paramValue'.");
             } else {
                 $this->addWhereClause($paramName, $paramValue);
             }
