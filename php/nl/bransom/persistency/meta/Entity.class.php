@@ -70,7 +70,7 @@ abstract class Entity {
     public function removeUnknownParameters(array& $params) {
         // Ignore tracking cookies and other unknown parameters.
         foreach($params as $paramName) {
-            if (!in_array($paramName, $this->properties)) {
+            if (strpos($paramName, '/') === FALSE && !in_array($paramName, $this->properties)) {
                 unset($params[$paramName]);
             }
         }
