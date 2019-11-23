@@ -24,12 +24,8 @@ class OpenIDConnectHandler {
       $jwt = HttpUtil::getJWTFromHeader();
     }
     $jwtPayload = OpenIDConnect::getValidatedJWTPayload($jwt);
-    if (isset($jwtPayload->email)
-            && $jwtPayload->email != NULL
-            && isset($jwtPayload->email_verified)
-            && $jwtPayload->email_verified === TRUE) {
-      $emailParts = explode('@', $jwtPayload->email);
-      return $this->getAccountIdByName($emailParts[0]);
+    if ($jwtPayload !== NULL) {
+      return $this->getAccountIdByName($jwtPayload->name);
     }
     return NULL;
   }
@@ -51,7 +47,8 @@ class OpenIDConnectHandler {
     try {
       $schema = MetaData::getInstance()->getSchema($this->appName);
       $mySQLi = $schema->getMySQLi();
-      $queryString = "SELECT id FROM " . DbConstants::TABLE_ACCOUNT . " WHERE name LIKE '" . $accountName . "'";
+      $queryString = "SELECT id FROM " . DbConstants::TABLE_ACCOUNT
+              . " WHERE REPLACE(REPLACE(name, '.', ''), ' ', '') LIKE REPLACE('$accountName', ' ', '')";
       $queryResult = $mySQLi->query($queryString);
       if (!$queryResult) {
         throw new Exception("Error fetching account ID for '$accountName' - $mySQLi->error\n<!--\n$queryString\n-->");
@@ -66,5 +63,4 @@ class OpenIDConnectHandler {
     }
     return $id;
   }
-
 }

@@ -11,88 +11,90 @@ Bootstrap::import('nl.bransom.auth.OpenIDConnect.SessionCache');
  * @author RobB
  */
 class OpenIDTokenVerifier {
-    
-    private static $JWT_CERTS_CACHE_KEY = array('id' => 'JWT_CERTS', 'exp' => 60);
-    
-    public static function getRawJWTPayload($jwt) {
-        $jwtParts = explode('.', $jwt);
-        if (count($jwtParts) === 3) {
-            return base64_decode($jwtParts[1]);
-        }
-        return NULL;
-    }
-    
-    public static function getValidatedJWTPayload($jwt, $jwks) {
-        if ($jwt == NULL) {
-            return NULL;
-        }
 
-        $payload = NULL;
-        if ($payload == NULL) {
-            $payload = self::verifySignature($jwt, $jwks);
-        }
-        if ($payload == NULL) {
-            $payload = self::verifySignatureFirebase($jwt);
-        }
-        if ($payload == NULL) {
-            $payload = self::verifySignatureAtGoogle($jwt);
-        }
-        return $payload;
-    }
-    
-    private static function verifySignature($jwt, $jwks) {
-        $jwtParts = explode('.', $jwt);
-        if (count($jwtParts) !== 3) {
-            throw new UnexpectedValueException('Incorrect JWT format.');
-        }
-        $jwtPayload = base64_decode($jwtParts[1]);
-        $payload = json_decode($jwtPayload, TRUE);
-        $email = $payload['email'];
-        
-        // Check if the token is still valid.
-        if (isset($payload['exp']) && time() >= $payload['exp']) {
-            throw new UnexpectedValueException("The JWT ($email) has expired.");
-        }
-        
-        $jwtHeader = base64_decode($jwtParts[0]);
-        $header = json_decode($jwtHeader, TRUE);
-        if ($header['alg'] != "RS256") {
-            throw new UnexpectedValueException("Unsupported JWT ($email) signature algorithm: " . $header['alg'] . '.');
-        }
-        $theKey = FALSE;
-        foreach ($jwks['keys'] as $key) {
-            if (strcasecmp ($key['kid'], $header['kid']) == 0) {
-                $theKey = $key;
-                break;
-            }
-        }
-        if ($theKey === FALSE) {
-            // throw new UnexpectedValueException("Cannot find JWT ($email) signature key.\n$jwt");
-            error_log("Cannot find JWT ($email) signature key.\n$jwt");
-            return NULL;
-        }
+  private static $JWT_HEADER_FIELDS = array('typ', 'alg', 'kid');
+  private static $JWT_PAYLOAD_FIELDS = array('name', 'nbf', 'exp', 'upn');
+  private static $OPENID_CERTS_CACHE_KEY = array('id' => 'JWT_CERTS', 'exp' => 60);
 
-//        // TODO - implement!
-//        $jwtSignature = base64_decode($jwtParts[2]);
-//        throw new Exception('TO BE IMPLEMENTED: verify JWT signature');
+  public static function getRawJWTPayload($jwt) {
+    $jwtParts = explode('.', $jwt);
+    if (count($jwtParts) === 3) {
+      return base64_decode($jwtParts[1]);
+    }
+    return NULL;
+  }
 
-        // Delegate signature verification to Firebase.
-        return self::verifySignatureFirebase($jwt);
+  public static function getValidatedJWTPayload($jwt, $jwks) {
+    if ($jwt === NULL) {
+      return NULL;
     }
-    
-    private static function verifySignatureFirebase($jwt) {
-        $jwtCertsJSON = SessionCache::get(self::$JWT_CERTS_CACHE_KEY);
-        if ($jwtCertsJSON === FALSE) {
-            $jwtCertsJSON = HttpUtil::processRequest('https://www.googleapis.com/oauth2/v1/certs');
-            SessionCache::set(self::$JWT_CERTS_CACHE_KEY, $jwtCertsJSON);
-        }
-        $jwtCerts = json_decode($jwtCertsJSON, TRUE);
-        return JWT::decode($jwt, $jwtCerts);
+
+    $jwtParts = explode('.', $jwt);
+    if (count($jwtParts) !== 3) {
+      throw new UnexpectedValueException('Incorrect JWT format.');
     }
-    
-    private static function verifySignatureAtGoogle($jwt) {
-        $response = HttpUtil::processRequest('https://www.googleapis.com/oauth2/v1/tokeninfo',
-                array('id_token' => $jwt));
-        return json_decode($response, TRUE);
+    $jwtHeader = json_decode(base64_decode($jwtParts[0]));
+    $jwtPayload = json_decode(base64_decode($jwtParts[1]));
+
+    // Check if all expected fields are present.
+    foreach (self::$JWT_HEADER_FIELDS as $field) {
+      if (!isset($jwtHeader->$field)) {
+        throw new UnexpectedValueException("The header of JWT ($jwtPayload->upn) does not contain field '$field'.");
+      }
     }
+    foreach (self::$JWT_PAYLOAD_FIELDS as $field) {
+      if (!isset($jwtPayload->$field)) {
+        throw new UnexpectedValueException("The payload of JWT ($jwtPayload->upn) does not contain field '$field'.");
+      }
+    }
+
+    // Check if the JWT header is valid.
+    if (strcasecmp($jwtHeader->typ, "JWT") !== 0) {
+      throw new UnexpectedValueException("Unsupported JWT ($jwtPayload->upn) type $jwtHeader->typ.");
+    }
+    if (strcasecmp($jwtHeader->alg, "RS256") !== 0) {
+      throw new UnexpectedValueException("Unsupported JWT ($jwtPayload->upn) signature algorithm: $jwtHeader->alg.");
+    }
+
+    // Check if the token is valid at this moment.
+    if (time() < $jwtPayload->nbf) {
+      throw new UnexpectedValueException("The JWT ($jwtPayload->upn) is not yet valid.");
+    }
+    if (time() >= $jwtPayload->exp) {
+      throw new UnexpectedValueException("The JWT ($jwtPayload->upn) has expired.");
+    }
+
+    // Check if the issuer, tenant and client IDs are OK.
+    if (strpos($jwtPayload->iss, OpenIDConnect::TENANT_ID) === FALSE) {
+      throw new UnexpectedValueException("The JWT ($jwtPayload->upn) not valid for this app.");
+    }
+    if (strcmp($jwtPayload->tid, OpenIDConnect::TENANT_ID) !== 0) {
+      throw new UnexpectedValueException("The JWT ($jwtPayload->upn) not valid for this app.");
+    }
+    if (strcmp($jwtPayload->aud, OpenIDConnect::CLIENT_ID) !== 0) {
+      throw new UnexpectedValueException("The JWT ($jwtPayload->upn) not valid for this app.");
+    }
+
+    // Delegate signature verification to Firebase.
+    return JWT::decode($jwt, self::getIssuerCerts());
+  }
+
+  private static function getIssuerCerts() {
+    $cachedCertsJSON = SessionCache::get(self::$OPENID_CERTS_CACHE_KEY);
+    if ($cachedCertsJSON !== FALSE) {
+      return json_decode($cachedCertsJSON, TRUE);
+    }
+
+    $issuerCertsJSON = HttpUtil::processRequest(OpenIDConnect::OPENID_CERTS_URL);
+    $issuerCertsRAW = json_decode($issuerCertsJSON);
+    $issuerCerts = array();
+    foreach ($issuerCertsRAW->keys as $key) {
+      $kid = $key->kid;
+      $x5c = $key->x5c[0];
+      $issuerCerts[$kid] = "-----BEGIN CERTIFICATE-----\n$x5c\n-----END CERTIFICATE-----";
+    }
+
+    SessionCache::set(self::$OPENID_CERTS_CACHE_KEY, json_encode($issuerCerts));
+    return $issuerCerts;
+  }
 }
