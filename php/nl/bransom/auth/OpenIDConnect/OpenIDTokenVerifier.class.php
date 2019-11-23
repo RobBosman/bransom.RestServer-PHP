@@ -14,17 +14,8 @@ class OpenIDTokenVerifier {
 
   private static $JWT_HEADER_FIELDS = array('typ', 'alg', 'kid');
   private static $JWT_PAYLOAD_FIELDS = array('name', 'nbf', 'exp', 'upn');
-  private static $OPENID_CERTS_CACHE_KEY = array('id' => 'JWT_CERTS', 'exp' => 60);
 
-  public static function getRawJWTPayload($jwt) {
-    $jwtParts = explode('.', $jwt);
-    if (count($jwtParts) === 3) {
-      return base64_decode($jwtParts[1]);
-    }
-    return NULL;
-  }
-
-  public static function getValidatedJWTPayload($jwt, $jwks) {
+  static function validateJWT($jwt) {
     if ($jwt === NULL) {
       return NULL;
     }
@@ -76,25 +67,6 @@ class OpenIDTokenVerifier {
     }
 
     // Delegate signature verification to Firebase.
-    return JWT::decode($jwt, self::getIssuerCerts());
-  }
-
-  private static function getIssuerCerts() {
-    $cachedCertsJSON = SessionCache::get(self::$OPENID_CERTS_CACHE_KEY);
-    if ($cachedCertsJSON !== FALSE) {
-      return json_decode($cachedCertsJSON, TRUE);
-    }
-
-    $issuerCertsJSON = HttpUtil::processRequest(OpenIDConnect::OPENID_CERTS_URL);
-    $issuerCertsRAW = json_decode($issuerCertsJSON);
-    $issuerCerts = array();
-    foreach ($issuerCertsRAW->keys as $key) {
-      $kid = $key->kid;
-      $x5c = $key->x5c[0];
-      $issuerCerts[$kid] = "-----BEGIN CERTIFICATE-----\n$x5c\n-----END CERTIFICATE-----";
-    }
-
-    SessionCache::set(self::$OPENID_CERTS_CACHE_KEY, json_encode($issuerCerts));
-    return $issuerCerts;
+    return JWT::decode($jwt, OpenIDConnect::getOpenIDJWKS());
   }
 }
