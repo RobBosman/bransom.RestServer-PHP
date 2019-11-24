@@ -36,31 +36,51 @@ class OpenIDConnectHandler {
         'exp' => 3600); // 1 hour
     $accountId = SessionCache::get($accountIdCacheKey);
     if ($accountId == NULL) {
-      $accountId = $this->getAccountIdByNameFromDB($accountName);
+      $accountId = $this->getOrCreateAccountIdByNameFromDB($accountName);
       SessionCache::set($accountIdCacheKey, $accountId);
     }
     return $accountId;
   }
 
-  private function getAccountIdByNameFromDB($accountName) {
-    $id = NULL;
+  private function getOrCreateAccountIdByNameFromDB($accountName) {
     try {
-      $schema = MetaData::getInstance()->getSchema($this->appName);
-      $mySQLi = $schema->getMySQLi();
-      $queryString = "SELECT id FROM " . DbConstants::TABLE_ACCOUNT
-              . " WHERE REPLACE(REPLACE(name, '.', ''), ' ', '') LIKE REPLACE('$accountName', ' ', '')";
-      $queryResult = $mySQLi->query($queryString);
-      if (!$queryResult) {
-        throw new Exception("Error fetching account ID for '$accountName' - $mySQLi->error\n<!--\n$queryString\n-->");
+      $id = $this->getAccountIdByNameFromDB($accountName);
+      if ($id == NULL) {
+        $this->createAccount($accountName);
+        $id = $this->getAccountIdByNameFromDB($accountName);
       }
-      $queryData = $queryResult->fetch_assoc();
-      if (isset($queryData['id'])) {
-        $id = $queryData['id'];
-      }
-      $queryResult->close();
+      return $id;
     } catch (Exception $e) {
       Bootstrap::logException($e);
     }
+  }
+
+  private function getAccountIdByNameFromDB($accountName) {
+    $id = NULL;
+    $schema = MetaData::getInstance()->getSchema($this->appName);
+    $mySQLi = $schema->getMySQLi();
+    $queryString = "SELECT id FROM " . DbConstants::TABLE_ACCOUNT
+            // ignore '.', '-' and ' ' while matching
+            . " WHERE REPLACE(REPLACE(REPLACE(name, '.' , ''), '-', ''), ' ', '') = REPLACE(REPLACE('$accountName', '-', ''), ' ', '')";
+    $queryResult = $mySQLi->query($queryString);
+    if (!$queryResult) {
+      throw new Exception("Error fetching account ID for '$accountName' - $mySQLi->error\n<!--\n$queryString\n-->");
+    }
+    $queryData = $queryResult->fetch_assoc();
+    if (isset($queryData['id'])) {
+      $id = $queryData['id'];
+    }
+    $queryResult->close();
     return $id;
+  }
+
+  private function createAccount($accountName) {
+    $schema = MetaData::getInstance()->getSchema($this->appName);
+    $mySQLi = $schema->getMySQLi();
+    $queryString = "INSERT INTO " . DbConstants::TABLE_ACCOUNT . " (name) VALUES('$accountName')";
+    $queryResult = $mySQLi->query($queryString);
+    if (!$queryResult || !$mySQLi->commit()) {
+      throw new Exception("Error creating account ID for '$accountName' - $mySQLi->error");
+    }
   }
 }
