@@ -3,6 +3,7 @@
 Bootstrap::import('nl.bransom.auth.OpenIDConnect.HttpUtil');
 Bootstrap::import('nl.bransom.auth.OpenIDConnect.OpenIDTokenVerifier');
 Bootstrap::import('nl.bransom.auth.OpenIDConnect.SessionCache');
+Bootstrap::import('nl.bransom.http.HttpResponseCodes');
 
 /**
  * Description of OpenIDConnect
