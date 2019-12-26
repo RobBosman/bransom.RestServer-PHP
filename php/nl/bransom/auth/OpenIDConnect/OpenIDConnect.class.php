@@ -15,9 +15,8 @@ class OpenIDConnect {
   const TENANT_ID = 'b44ed446-bdd4-46ab-a5b3-95ccdb7d4663';
   const CLIENT_ID = '348af39a-f707-4090-bb0a-9e4dca6e4138';
   const CLIENT_SECRET = '_L2w?hG1ugvVch2i7GVC.Nji_50a64N?';
-  const OPENID_CONFIG_URL = 'https://login.microsoftonline.com/valori.nl/.well-known/openid-configuration';
+  const OPENID_CONFIG_URL = 'https://login.microsoftonline.com/' . self::TENANT_ID . '/v2.0/.well-known/openid-configuration';
   const OPENID_CONFIG_AUTH_ENDPOINT_KEY = 'authorization_endpoint';
-  const OPENID_CONFIG_TOKEN_ENDPOINT_KEY = 'token_endpoint';
   const OPENID_CONFIG_JWKS_URI_KEY = 'jwks_uri';
 
   private static $OPENID_CONFIG_CACHE_KEY = array(
@@ -37,29 +36,41 @@ class OpenIDConnect {
     return SessionCache::get(self::$PARKED_JWT_CACHE_KEY);
   }
 
-  public static function authenticate($redirectUrl, $hostedDomain, $legacyRealm = NULL) {
+  public static function authenticate($redirectUrl, $scope, $hostedDomain) {
     $jwt = HttpUtil::getJWTFromHeader();
     $jwtPayload = self::getValidatedJWTPayload($jwt);
     if ($jwtPayload === NULL) {
-      $requestError = filter_input(INPUT_GET, 'error');
-      if (isset($requestError)) {
-        self::logErrorAndClearCache($requestError);
-        HttpUtil::replyError(HttpResponseCodes::HTTP_INTERNAL_SERVER_ERROR, $requestError);
+      // This method is called twice in the authentication process:
+      // 1) to send a (GET) token request to the OpenID provider
+      // 2) to process the (POST) response of that request.
+      
+      // If no POST data was received, then the token has not yet been requested.
+      if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        self::requestAccessToken($redirectUrl, $scope, $hostedDomain);
       }
-
-      $requestState = filter_input(INPUT_GET, 'state');
-      $requestCode = filter_input(INPUT_GET, 'code');
-      if (!isset($requestState)) {
-        self::requestAuthCode($redirectUrl, $hostedDomain, $legacyRealm);
-      } else if ($requestState != self::getAntiForgeryStateToken(FALSE)) {
-        self::logErrorAndClearCache("Invalid state parameter: expected '"
-                . self::getAntiForgeryStateToken(FALSE)
-                . "' but got '$requestState'.\n$_SERVER[REQUEST_URI]");
-        HttpUtil::replyError(HttpResponseCodes::HTTP_UNAUTHORIZED, 'Invalid state parameter');
-      } else if (isset($requestCode)) {
-        $jwt = self::exchangeCodeForJWT($requestCode, $redirectUrl);
+      
+      // OK, so now we are processing the token response.
+      $receivedData = (object) filter_input_array(INPUT_POST);
+      if (isset($receivedData->error)) {
+        self::logErrorAndClearCache($receivedData->error);
+        HttpUtil::replyError(HttpResponseCodes::HTTP_INTERNAL_SERVER_ERROR, $receivedData->error);
+      } else if (!isset($receivedData->state)) {
+        $errorMsg = "State not present.";
+        self::logErrorAndClearCache($errorMsg);
+        HttpUtil::replyError(HttpResponseCodes::HTTP_UNAUTHORIZED, $errorMsg);
+      } else if ($receivedData->state != "state-" . self::getAntiForgeryStateToken()) {
+        $errorMsg = "Invalid state: expected 'state-"
+            . self::getAntiForgeryStateToken()
+            . "' but got '$receivedData->state'.";
+        self::logErrorAndClearCache($errorMsg);
+        HttpUtil::replyError(HttpResponseCodes::HTTP_UNAUTHORIZED, $errorMsg);
+      } else if (!isset($receivedData->access_token)) {
+        $errorMsg = 'An error occurred while requesting a token from the OpenID provider.';
+        self::logErrorAndClearCache($errorMsg);
+        HttpUtil::replyError(HttpResponseCodes::HTTP_UNAUTHORIZED, $errorMsg);
+      } else{
         // Temporarilly store the JWT in the session.
-        SessionCache::set(self::$PARKED_JWT_CACHE_KEY, $jwt);
+        SessionCache::set(self::$PARKED_JWT_CACHE_KEY, $receivedData->access_token);
       }
     }
   }
@@ -70,30 +81,25 @@ class OpenIDConnect {
     }
     
     try {
-      return OpenIDTokenVerifier::validateJWT($jwt);
+      $nonce = "nonce-" . self::getAntiForgeryStateToken();
+      return OpenIDTokenVerifier::validateJWT($jwt, $nonce);
     } catch (Exception $e) {
       self::logErrorAndClearCache($e->getMessage() . "\r\n" . $e->getTraceAsString());
     }
   }
 
   // Set the client ID, token state, and application name in the HTML while serving it.
-  private static function requestAuthCode($redirectUrl, $hostedDomain, $legacyRealm) {
+  private static function requestAccessToken($redirectUri, $scope, $hostedDomain) {
+    $nonce = self::getAntiForgeryStateToken(TRUE);
     $requestParams = array();
     $requestParams['client_id'] = self::CLIENT_ID;
-    $requestParams['response_type'] = 'code';
-    $requestParams['scope'] = 'openid'; // openid + profile
-    $requestParams['redirect_uri'] = $redirectUrl;
-    $requestParams['state'] = self::getAntiForgeryStateToken(TRUE);
-    // prompt = [optional] none | consent | select_account
-    // login_hint = [optional] ...
-    // display = [optional] page | popup | touch | wap
-    // access_type = [optional] offline | online
-    // include_granted_scopes = [optional] true | false
-    $requestParams['hd'] = $hostedDomain;
-    if ($legacyRealm != NULL && strpos($redirectUrl, $legacyRealm) !== FALSE) {
-      $requestParams['openid.realm'] = $legacyRealm;
-    }
-
+    $requestParams['redirect_uri'] = $redirectUri;
+    $requestParams['domain_hint'] = $hostedDomain;
+    $requestParams['response_type'] = 'token';
+    $requestParams['scope'] = $scope;
+    $requestParams['nonce'] = "nonce-$nonce";
+    $requestParams['state'] = "state-$nonce";
+    $requestParams['response_mode'] = 'form_post';
     $openIdAuthEndpoint = self::getOpenIDConfig(self::OPENID_CONFIG_AUTH_ENDPOINT_KEY);
     $targetUrl = $openIdAuthEndpoint . (strpos($openIdAuthEndpoint, '?') === FALSE ? '?' : '&')
             . HttpUtil::toQueryString($requestParams);
@@ -103,31 +109,13 @@ class OpenIDConnect {
     exit;
   }
 
-  private static function exchangeCodeForJWT($receivedCode, $redirectUrl) {
-    // Ensure that there is no request forgery going on, and that the user sending us this connect request is
-    // the user that was supposed to.
-    $requestParams = array();
-    $requestParams['code'] = $receivedCode;
-    $requestParams['client_id'] = self::CLIENT_ID;
-    $requestParams['client_secret'] = self::CLIENT_SECRET;
-    $requestParams['redirect_uri'] = $redirectUrl;
-    $requestParams['grant_type'] = 'authorization_code';
-    $openIdTokenEndpoint = self::getOpenIDConfig(self::OPENID_CONFIG_TOKEN_ENDPOINT_KEY);
-    $responseJSON = HttpUtil::processRequest($openIdTokenEndpoint, $requestParams);
-    $response = json_decode($responseJSON);
-    if (isset($response->id_token)) {
-      return $response->id_token;
-    }
-    return NULL;
-  }
-
   /**
    * Create a state token to prevent request forgery.
    * Store it in the session for later validation.
    */
-  private static function getAntiForgeryStateToken($createIfAbsent) {
+  private static function getAntiForgeryStateToken($recreate = FALSE) {
     $stateToken = SessionCache::get(self::$ANTI_FORGERY_STATE_TOKEN_CACHE_KEY);
-    if ($stateToken === FALSE && $createIfAbsent) {
+    if ($stateToken === FALSE or $recreate) {
       $stateToken = md5(rand());
       SessionCache::set(self::$ANTI_FORGERY_STATE_TOKEN_CACHE_KEY, $stateToken);
     }
@@ -141,6 +129,12 @@ class OpenIDConnect {
       SessionCache::set(self::$OPENID_CONFIG_CACHE_KEY, $openIDConfigJSON);
     }
     $openIDConfig = json_decode($openIDConfigJSON);
+    if (!isset($openIDConfig->$key)) {
+      $errorMsg = "Error fecthing '$key' from OpenID config:\n$openIDConfigJSON";
+      self::logErrorAndClearCache($errorMsg);
+      HttpUtil::replyError(HttpResponseCodes::HTTP_INTERNAL_SERVER_ERROR, $errorMsg);
+      return NULL;
+    }
     return $openIDConfig->$key;
   }
 

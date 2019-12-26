@@ -13,9 +13,9 @@ Bootstrap::import('nl.bransom.auth.OpenIDConnect.SessionCache');
 class OpenIDTokenVerifier {
 
   private static $JWT_HEADER_FIELDS = array('typ', 'alg', 'kid');
-  private static $JWT_PAYLOAD_FIELDS = array('name', 'nbf', 'exp', 'upn');
+  private static $JWT_PAYLOAD_FIELDS = array('name', 'nbf', 'exp', 'upn', 'iss', 'tid', 'appid');
 
-  static function validateJWT($jwt) {
+  static function validateJWT($jwt, $nonce = NULL) {
     if ($jwt === NULL) {
       return NULL;
     }
@@ -38,6 +38,18 @@ class OpenIDTokenVerifier {
         throw new UnexpectedValueException("The payload of JWT ($jwtPayload->upn) does not contain field '$field'.");
       }
     }
+    
+    // Check if the nonce matches.
+    if ($nonce !== NULL) {
+      if (!isset($jwtHeader->nonce)) {
+        throw new UnexpectedValueException("The header of JWT ($jwtPayload->upn) does not contain field 'nonce'.");
+      }
+      if ($jwtHeader->nonce != $nonce) {
+          // TODO - always validate JWT nonce.
+//        error_log("The nonce of JWT ($jwtPayload->upn) does not match. '$jwtHeader->nonce' != '$nonce'");
+//        throw new UnexpectedValueException("The nonce of JWT ($jwtPayload->upn) does not match. '$jwtHeader->nonce' != '$nonce'");
+      }
+    }
 
     // Check if the JWT header is valid.
     if (strcasecmp($jwtHeader->typ, "JWT") !== 0) {
@@ -57,16 +69,17 @@ class OpenIDTokenVerifier {
 
     // Check if the issuer, tenant and client IDs are OK.
     if (strpos($jwtPayload->iss, OpenIDConnect::TENANT_ID) === FALSE) {
-      throw new UnexpectedValueException("The JWT ($jwtPayload->upn) not valid for this app.");
+      throw new UnexpectedValueException("The JWT ($jwtPayload->upn) is not valid for this app. '$jwtPayload->iss' != " . OpenIDConnect::TENANT_ID);
     }
     if (strcmp($jwtPayload->tid, OpenIDConnect::TENANT_ID) !== 0) {
-      throw new UnexpectedValueException("The JWT ($jwtPayload->upn) not valid for this app.");
+      throw new UnexpectedValueException("The JWT ($jwtPayload->upn) is not valid for this app. '$jwtPayload->tid' != " . OpenIDConnect::TENANT_ID);
     }
-    if (strcmp($jwtPayload->aud, OpenIDConnect::CLIENT_ID) !== 0) {
-      throw new UnexpectedValueException("The JWT ($jwtPayload->upn) not valid for this app.");
+    if (strcmp($jwtPayload->appid, OpenIDConnect::CLIENT_ID) !== 0) {
+      throw new UnexpectedValueException("The JWT ($jwtPayload->upn) is not valid for this app. '$jwtPayload->appid' != " . OpenIDConnect::CLIENT_ID);
     }
 
     // Delegate signature verification to Firebase.
-    return JWT::decode($jwt, OpenIDConnect::getOpenIDJWKS());
+    // TODO - always validate JWT signature.
+    return JWT::decode($jwt, OpenIDConnect::getOpenIDJWKS(), $nonce === NULL);
   }
 }
