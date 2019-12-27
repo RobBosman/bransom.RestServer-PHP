@@ -15,8 +15,8 @@ class DbConnection {
         $config = Config::getInstance();
         $configDb = $config->getSection('db');
         if ((!isset($configDb['hostName'])) or (!isset($configDb['userName'])) or (!isset($configDb['password']))) {
-            throw new Exception("Config error: please specify properties 'hostName', 'userName' and 'password'"
-                    . " in section [db].");
+            throw new Exception("Configuratiefout: specificeer properties 'hostName', 'userName' en 'password'"
+                    . " in sectie [db].");
         }
         $hostName = $configDb['hostName'];
         $userName = $configDb['userName'];

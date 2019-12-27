@@ -15,8 +15,8 @@ class HttpConfig {
         if ((!isset($configHttp['proxy.hostName'])) or (!isset($configHttp['proxy.port']))
                 or (!isset($configHttp['proxy.userName'])) or (!isset($configHttp['proxy.password']))
                 or (!isset($configHttp['proxy.except-for-hosts']))) {
-            throw new Exception("Config error: please specify properties 'proxy.hostName', 'proxy.port',"
-                    . " 'proxy.userName', 'proxy.password' and 'proxy.except-for-hosts' in section [http].");
+            throw new Exception("Configuratiefout: specificeer properties 'proxy.hostName', 'proxy.port',"
+                    . " 'proxy.userName', 'proxy.password' en 'proxy.except-for-hosts' in sectie [http].");
         }
         $proxyHost = $configHttp['proxy.hostName'];
         $noProxyHosts = $configHttp['proxy.except-for-hosts'];

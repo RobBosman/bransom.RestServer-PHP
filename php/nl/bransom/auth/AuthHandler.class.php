@@ -17,7 +17,7 @@ class AuthHandler {
     $authModelPropertyName = 'authentication-model-for-app.' . $appName;
     $authModel = self::getAuthModel($authModelPropertyName);
     if ($authModel === NULL) {
-      throw new Exception("Config error: please specify property '$authModelPropertyName' in section [auth].");
+      throw new Exception("Configuratiefout: specificeer property '$authModelPropertyName' in sectie [auth].");
     }
     if (strcasecmp($authModel, 'OpenIDConnect') === 0) {
       $handler = new OpenIDConnectHandler($appName);
@@ -27,7 +27,7 @@ class AuthHandler {
     } else if (strcasecmp($authModel, 'NONE') == 0 || $authModel == '') {
       return 1;
     } else {
-      throw new Exception("Config error: unexpected value for property $authModelPropertyName: '$authModel'.");
+      throw new Exception("Configuratiefout: onbekende waarde voor property $authModelPropertyName: '$authModel'.");
     }
   }
 

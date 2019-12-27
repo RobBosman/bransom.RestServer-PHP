@@ -48,6 +48,7 @@ class HttpResponseCodes {
     const HTTP_UNSUPPORTED_MEDIA_TYPE = 415;
     const HTTP_REQUESTED_RANGE_NOT_SATISFIABLE = 416;
     const HTTP_EXPECTATION_FAILED = 417;
+    const HTTP_LOCKED = 423;
     // [Server Error 5xx]
     const HTTP_INTERNAL_SERVER_ERROR = 500;
     const HTTP_NOT_IMPLEMENTED = 501;
@@ -92,6 +93,7 @@ class HttpResponseCodes {
         self::HTTP_UNSUPPORTED_MEDIA_TYPE => 'Unsupported Media Type',
         self::HTTP_REQUESTED_RANGE_NOT_SATISFIABLE => 'Requested Range Not Satisfiable',
         self::HTTP_EXPECTATION_FAILED => 'Expectation Failed',
+        self::HTTP_LOCKED => 'Resource Locked',
         self::HTTP_INTERNAL_SERVER_ERROR => 'Internal Server Error',
         self::HTTP_NOT_IMPLEMENTED => 'Not Implemented',
         self::HTTP_BAD_GATEWAY => 'Bad Gateway',
@@ -102,7 +104,7 @@ class HttpResponseCodes {
 
     public static function getMessage($httpResponseCode) {
         if (!array_key_exists($httpResponseCode, self::$RESPONSE_MESSAGES)) {
-            throw new Exception("Unknown HTTP ResponseCode: $httpResponseCode.");
+            return("Unknown HTTP ResponseCode: $httpResponseCode.");
         }
         return self::$RESPONSE_MESSAGES[$httpResponseCode];
     }

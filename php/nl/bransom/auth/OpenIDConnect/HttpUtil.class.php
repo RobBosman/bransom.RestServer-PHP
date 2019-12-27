@@ -58,7 +58,7 @@ class HttpUtil {
      * @param type $errorMessage
      */
     public static function replyError($responseCode, $errorMessage) {
-        header("HTTP/1.1 $responseCode $errorMessage", TRUE, $responseCode);
+        header("HTTP/1.1 $responseCode $errorMessage", true, $responseCode);
         header("Content-type: text/html");
         echo <<<EOT
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
