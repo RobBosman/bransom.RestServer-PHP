@@ -15,7 +15,7 @@ class OpenIDConnect {
   const TENANT_ID = 'b44ed446-bdd4-46ab-a5b3-95ccdb7d4663';
   const CLIENT_ID = '348af39a-f707-4090-bb0a-9e4dca6e4138';
   const CLIENT_SECRET = '_L2w?hG1ugvVch2i7GVC.Nji_50a64N?';
-  const OPENID_CONFIG_URL = 'https://login.microsoftonline.com/' . self::TENANT_ID . '/v2.0/.well-known/openid-configuration';
+  const OPENID_CONFIG_URL = 'https://login.microsoftonline.com/b44ed446-bdd4-46ab-a5b3-95ccdb7d4663/v2.0/.well-known/openid-configuration';
   const OPENID_CONFIG_AUTH_ENDPOINT_KEY = 'authorization_endpoint';
   const OPENID_CONFIG_JWKS_URI_KEY = 'jwks_uri';
 
