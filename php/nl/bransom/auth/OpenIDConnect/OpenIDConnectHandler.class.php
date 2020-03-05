@@ -2,6 +2,7 @@
 
 Bootstrap::import('nl.bransom.auth.OpenIDConnect.HttpUtil');
 Bootstrap::import('nl.bransom.auth.OpenIDConnect.OpenIDConnect');
+Bootstrap::import('nl.bransom.auth.OpenIDConnect.SessionCache');
 Bootstrap::import('nl.bransom.persistency.meta.DbConstants');
 Bootstrap::import('nl.bransom.persistency.meta.MetaData');
 Bootstrap::import('nl.bransom.persistency.meta.Schema');
@@ -32,8 +33,8 @@ class OpenIDConnectHandler {
 
   private function getAccountIdByName($accountName) {
     $accountIdCacheKey = array(
-        'id' => 'ACCOUND_ID_FOR_' . strtolower($accountName),
-        'exp' => 3600); // 1 hour
+        SessionCache::ID => 'ACCOUND_ID_FOR_' . strtolower($accountName),
+        SessionCache::EXP => 3600); // 1 hour
     $accountId = SessionCache::get($accountIdCacheKey);
     if ($accountId == NULL) {
       $accountId = $this->getOrCreateAccountIdByNameFromDB($accountName);

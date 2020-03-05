@@ -3,7 +3,6 @@
 require_once Bootstrap::phpRootDir() . '/Firebase/PHP-JWT/Authentication/JWT.php';
 Bootstrap::import('nl.bransom.auth.OpenIDConnect.HttpUtil');
 Bootstrap::import('nl.bransom.auth.OpenIDConnect.OpenIDConnect');
-Bootstrap::import('nl.bransom.auth.OpenIDConnect.SessionCache');
 
 /**
  * Description of OpenIDTokenVerifier

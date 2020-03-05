@@ -20,17 +20,17 @@ class OpenIDConnect {
   const OPENID_CONFIG_JWKS_URI_KEY = 'jwks_uri';
 
   private static $OPENID_CONFIG_CACHE_KEY = array(
-      'id' => 'OpenIDConfig',
-      'exp' => 3600); // 1 hours
+      SessionCache::ID => 'OpenIDConfig',
+      SessionCache::EXP => 3600); // 1 hour
   private static $JWKS_CACHE_KEY = array(
-      'id' => 'JWKS',
-      'exp' => 3600); // 1 hours
+      SessionCache::ID => 'JWKS',
+      SessionCache::EXP => 3600); // 1 hour
   private static $ANTI_FORGERY_STATE_TOKEN_CACHE_KEY = array(
-      'id' => 'AntiForgeryStateToken',
-      'exp' => 600); // 10 minutes
+      SessionCache::ID => 'AntiForgeryStateToken',
+      SessionCache::EXP => 600); // 10 minutes
   private static $PARKED_JWT_CACHE_KEY = array(
-      'id' => 'ParkedJWT',
-      'exp' => 10); // 10 seconds
+      SessionCache::ID => 'ParkedJWT',
+      SessionCache::EXP => 10); // 10 seconds
 
   public static function getParkedJWT() {
     return SessionCache::get(self::$PARKED_JWT_CACHE_KEY);

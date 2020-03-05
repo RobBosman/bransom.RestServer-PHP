@@ -9,13 +9,13 @@ Bootstrap::startSession();
  */
 class SessionCache {
 
-  const ID = 'id';
-  const EXP = 'exp';
+  const ID = 'SessionCache_id';
+  const EXP = 'SessionCache_expire_millis';
 
   private static $NUM_TIME_DIGITS = 12;
 
   public static function get($cacheKey) {
-    $key = self::getSessionKey($cacheKey);
+    $key = $cacheKey[self::ID];
     if (!isset($_SESSION) || !array_key_exists($key, $_SESSION)) {
       return FALSE;
     }
@@ -35,13 +35,7 @@ class SessionCache {
   }
 
   public static function clear($cacheKey) {
-    $key = self::getSessionKey($cacheKey);
-    if (isset($_SESSION) && array_key_exists($key, $_SESSION)) {
-      unset($_SESSION[$key]);
-    }
-  }
-  
-  private static function getSessionKey($cacheKey) {
-    return $cacheKey[self::ID];
+    $key = $cacheKey[self::ID];
+    unset($_SESSION[$key]);
   }
 }
