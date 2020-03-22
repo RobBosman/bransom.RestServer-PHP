@@ -391,37 +391,36 @@ class ObjectModifier {
             throw new Exception("Error creating prepared statement to insert '$entityName' - "
                     . "$mySQLi->error\n<!--\n$queryString\n-->");
         }
+        
         // Don't throw exceptions before closing the prepared statement.
-        $exception = NULL;
-        // Fill-in the parameters.
-        $bindParams = array(&$types);
-        for ($i = 0; $i < count($values); $i++) {
-            $bindParams[] = &$values[$i];
-        }
-        call_user_func_array(array($stmt, "bind_param"), $bindParams);
-        foreach ($blobs as $index => $value) {
-            $stmt->send_long_data($index, base64_decode($value));
-        }
-        // Execute the query.
-        $queryResult = $stmt->execute();
-        if (!$queryResult) {
-            $formattedPropertyValues = array();
-            foreach ($propertyValues as $columnName => $value) {
-                $formattedPropertyValues[] = "$columnName=$value";
+        try {
+            // Fill-in the parameters.
+            $bindParams = array(&$types);
+            for ($i = 0; $i < count($values); $i++) {
+                $bindParams[] = &$values[$i];
             }
-            $exception = new Exception("Error " . ($mustInsert ? 'inserting' : 'updating')
-                    . " object '$entityName' - $mySQLi->error\n<!-- " . implode(', ', $formattedPropertyValues)
-                    . " -->");
-        } else if ($id == NULL) {
-            $id = $mySQLi->insert_id;
+            call_user_func_array(array($stmt, "bind_param"), $bindParams);
+            foreach ($blobs as $index => $value) {
+                $stmt->send_long_data($index, base64_decode($value));
+            }
+            // Execute the query.
+            $queryResult = $stmt->execute();
+            if (!$queryResult) {
+                $formattedPropertyValues = array();
+                foreach ($propertyValues as $columnName => $value) {
+                    $formattedPropertyValues[] = "$columnName=$value";
+                }
+                throw new Exception("Error " . ($mustInsert ? 'inserting' : 'updating')
+                        . " object '$entityName' - $mySQLi->error\n<!-- " . implode(', ', $formattedPropertyValues)
+                        . " -->");
+            } else if ($id == NULL) {
+                $id = $mySQLi->insert_id;
+            }
+            return $id;
+        } finally {
+            // Close the prepared statement before throwing any exception.
+            $stmt->close();
         }
-        // Close the prepared statement before throwing any exception.
-        $stmt->close();
-        if ($exception != NULL) {
-            throw $exception;
-        }
-
-        return $id;
     }
 
     private function terminateObject(Schema $schema, ObjectEntity $entity, $id, Audit $audit) {
